@@ -1,0 +1,11 @@
+{
+  "name": "liquidator",
+  "version": "1.0.0",
+  "description": "Liquidator 'L-1000' dApp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "bartlomiej_perekitko",
+  "license": "MIT"
+}
