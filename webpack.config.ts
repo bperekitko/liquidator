@@ -53,6 +53,9 @@ const config: webpack.Configuration = {
     historyApiFallback: true,
     hotOnly: true,
   },
+  optimization: {
+    minimize: true,
+  },
   plugins: [new webpack.HotModuleReplacementPlugin()],
 };
 
