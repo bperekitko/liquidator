@@ -2,11 +2,14 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
-        "jsx": "react",
-        "strict": true,
         "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
+        "allowSyntheticDefaultImports": true,
+        "jsx": "react",
+        "lib": [
+            "es2015",
+            "dom",
+            "dom.iterable"
+        ],
         "sourceMap": true,
     },
     "exclude": [

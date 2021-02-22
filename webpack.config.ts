@@ -10,11 +10,18 @@ const config: webpack.Configuration = {
       {
         test: /\.tsx?$/,
         use: 'ts-loader',
+        include: path.resolve(__dirname, 'src'),
         exclude: /node_modules/,
       },
       {
         test: /\.s[ac]ss$/i,
         use: ['style-loader', 'css-loader', 'sass-loader'],
+        include: path.resolve(__dirname, 'src'),
+      },
+      {
+        test: /\.(jpe?g|png|gif)$/i,
+        use: 'file-loader',
+        include: path.resolve(__dirname, 'src'),
       },
       {
         test: /\.svg$/,
@@ -22,15 +29,8 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[contenthash].[ext]',
-              outputPath: 'fonts/',
-            },
-          },
-        ],
+        use: 'file-loader',
+        include: path.resolve(__dirname, 'src'),
       },
     ],
   },

@@ -1,0 +1,18 @@
+.wallet_connector {
+  height: 50px;
+  width: 33%;
+  color: #00d1ff;
+  background-color: #00418561;
+  border: 1px solid #00d1ff;
+  box-shadow: #00d1ff 0px 0px 10px;
+  border-top: none;
+  border-radius: 0 0 100px 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    color: white;
+    cursor: pointer;
+  }
+}

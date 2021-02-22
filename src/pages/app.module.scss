@@ -1,0 +1,23 @@
+.app {
+  background-image: url('../assets/images/background.jpg');
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.get_price {
+  color: #00d1ff;
+  &:hover {
+    color: white;
+    cursor: pointer;
+  }
+}
+
+.price_label {
+  color: #00d1ff;
+}
+
+.price_value {
+  color: #00ff15;
+}
