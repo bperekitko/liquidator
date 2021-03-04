@@ -17,5 +17,6 @@
         "./src/**/*.spec.tsx",
         "node_modules",
         "./dist/",
+        "./public"
     ]
 }

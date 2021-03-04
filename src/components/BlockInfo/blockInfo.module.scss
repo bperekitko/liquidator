@@ -1,0 +1,33 @@
+.block_info {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  min-height: 160px;
+  position: absolute;
+  left: 0;
+  color: #00d1ff;
+  background-color: #00418561;
+  border: 1px solid #00d1ff;
+  box-shadow: #00d1ff 0px 0px 10px;
+  border-top: none;
+  border-left: none;
+  border-radius: 0 0 100px;
+  padding: 16px 32px 16px 16px;
+  box-sizing: border-box;
+}
+
+.block_info_title {
+  border-radius: 10px;
+  text-align: center;
+  padding: 2px;
+  box-sizing: border-box;
+  box-shadow: #00d1ff 1px 1px 5px;
+  margin-bottom: 16px;
+}
+
+.block_info_field {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 2px 0;
+}

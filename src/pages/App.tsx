@@ -1,41 +1,31 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import styles from './app.module.scss';
-import { getPriceFor } from '../ethereum/uniswap/getPriceFor';
-import WalletConnector from '../components/WalletConnector/WalletConnector';
-import TokenSelector from '../components/TokenSelector/TokenSelector';
+import { WalletConnector } from '../components/WalletConnector/WalletConnector';
+import { TradeSelector } from '../components/TradeSelector/TradeSelector';
 import { Token } from '../ethereum/arbitrage/Token';
+import { UniswapPrice } from '../components/UniswapPrice/UniswapPrice';
+import { SusiswapPrice } from '../components/SushiswapPrice/SusiswapPrice';
+import { BlockInfo } from '../components/BlockInfo/BlockInfo';
+import { BalancerPrice } from '../components/BalancerPrice/BalancerPrice';
+import { Web3Provider } from '../ethereum/web3/Web3Context';
 
 const App: FunctionComponent<Record<string, never>> = () => {
-  const [price, setPrice] = useState('');
   const [inputToken, setInputToken] = useState<Token>();
   const [outputToken, setOutputToken] = useState<Token>();
 
-  useEffect(() => {
-    setPrice('');
-    if (inputToken && outputToken && inputToken.ticker !== outputToken.ticker) {
-      getPriceFor(inputToken, outputToken).then((price) => {
-        setPrice(price);
-      });
-    }
-  }, [inputToken, outputToken]);
-
-  const onInputTokenChanged = (token: Token) => setInputToken(token);
-  const onOutputTokenChanged = (token: Token) => setOutputToken(token);
-
   return (
-    <>
+    <Web3Provider>
       <div className={styles.app}>
-        <WalletConnector></WalletConnector>
-        <TokenSelector onToken0Changed={onInputTokenChanged} onToken1Changed={onOutputTokenChanged}></TokenSelector>
-        <div>
-          {price && (
-            <div className={styles.price_label}>
-              FOR 1 {inputToken.ticker} BORROWED YOU WILL HAVE TO PAY {price} {outputToken.ticker}
-            </div>
-          )}
+        <BlockInfo />
+        <WalletConnector />
+        <TradeSelector onToken0Changed={setInputToken} onToken1Changed={setOutputToken} />
+        <div className={styles.platforms}>
+          <UniswapPrice token0={inputToken} token1={outputToken} />
+          <SusiswapPrice token0={inputToken} token1={outputToken} />
+          <BalancerPrice token0={inputToken} token1={outputToken} />
         </div>
       </div>
-    </>
+    </Web3Provider>
   );
 };
 

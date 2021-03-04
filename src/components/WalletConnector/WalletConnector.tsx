@@ -1,27 +1,13 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import styles from './walletConnector.module.scss';
-import { onAccountsChanged, getActiveAddress } from '../../ethereum/web3/Ethereum';
+import { useWeb3State } from '../../ethereum/web3/Web3Context';
 
-const WalletConnector: FunctionComponent<unknown> = () => {
-  const [address, setAddress] = useState('');
-
-  useEffect(() => {
-    onAccountsChanged(async () => {
-      const activeAddress = await getActiveAddress();
-      setAddress(activeAddress);
-    });
-  }, []);
-
-  const onConnectWalletClicked = async () => {
-    const activeAddress = await getActiveAddress();
-    setAddress(activeAddress);
-  };
+export const WalletConnector: FunctionComponent<unknown> = () => {
+  const { activeAddress, initializeProvider } = useWeb3State();
 
   return (
-    <div className={styles.wallet_connector} onClick={onConnectWalletClicked}>
-      {address ? address : 'Connect Wallet'}
+    <div className={styles.wallet_connector} onClick={initializeProvider}>
+      {activeAddress ? activeAddress : 'Connect Wallet'}
     </div>
   );
 };
-
-export default WalletConnector;
