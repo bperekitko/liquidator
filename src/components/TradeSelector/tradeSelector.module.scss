@@ -4,4 +4,8 @@
   justify-content: center;
   height: 60px;
   margin: 25px;
+
+  ::placeholder {
+    color: darken(#00d1ff, 20%);
+  }
 }

@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Token } from '../../ethereum/arbitrage/Token';
 import { getPriceOnSushiswap } from '../../ethereum/uniswap/getPrice';
 import { useWeb3State } from '../../ethereum/web3/Web3Context';
 import { DexPrice } from '../DexPrice/DexPrice';
 
-interface UniswapPriceProps {
+interface SushiswapPriceProps {
+  amount: number;
   token0: Token;
   token1: Token;
 }
 
-export function SusiswapPrice({ token0, token1 }: UniswapPriceProps): JSX.Element {
+export function SushiswapPrice({ amount, token0, token1 }: SushiswapPriceProps): JSX.Element {
   const { ethereum } = useWeb3State();
 
-  const getPrice = (token0: Token, token1: Token) => {
-    return getPriceOnSushiswap(token0, token1, ethereum);
+  const getPrice = (amt: number, t0: Token, t1: Token) => {
+    return getPriceOnSushiswap(amt, t0, t1, ethereum);
   };
 
-  return <DexPrice token0={token0} token1={token1} dexName={'Sushiswap'} getPrice={getPrice} />;
+  return <DexPrice amount={amount} token0={token0} token1={token1} dexName={'Sushiswap'} getPrice={getPrice} />;
 }

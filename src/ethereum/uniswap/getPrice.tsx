@@ -1,32 +1,34 @@
 import { Token } from '../arbitrage/Token';
-import { toBN } from 'web3-utils';
 import { fetchUniswapReserves } from './fetchReserves';
-import BN from 'bn.js';
-import { formatBNToDecimal } from './formatBNtoDecimal';
 import { Eth } from 'web3-eth';
+import BigNumber from 'bignumber.js';
 
 const FRACTIONAL_PRECISION = 6;
-const WITH_FEE_MULTIPLIER = toBN(997);
-const WITHOUT_FEE_MULTIPLIER = toBN(1000);
+const WITH_FEE_MULTIPLIER = 997;
+const WITHOUT_FEE_MULTIPLIER = 1000;
 
-export const getPriceOnUniswap = async (inputToken: Token, outputToken: Token, ethereum: Eth): Promise<string> => {
-  const [inputReserve, outputReserve] = await fetchUniswapReserves(inputToken, outputToken, ethereum);
-  return computeAmountIn(
-    toBN(inputToken.decimals),
-    toBN(outputToken.decimals),
-    toBN(inputReserve),
-    toBN(outputReserve)
-  );
+export const getPriceOnUniswap = async (amount: number, input: Token, output: Token, eth: Eth): Promise<string> => {
+  const [inputReserve, outputReserve] = await fetchUniswapReserves(input, output, eth);
+  const amountOut = new BigNumber(amount).multipliedBy(10 ** input.decimals);
+  const amountIn = computeAmountIn(amountOut, new BigNumber(inputReserve), new BigNumber(outputReserve));
+
+  return amountIn
+    .dividedBy(10 ** output.decimals)
+    .dividedBy(amount)
+    .decimalPlaces(FRACTIONAL_PRECISION)
+    .toString();
 };
 
-export const getPriceOnSushiswap = async (inputToken: Token, outputToken: Token, ethereum: Eth): Promise<string> => {
-  const [inputReserve, outputReserve] = await fetchUniswapReserves(inputToken, outputToken, ethereum);
-  return computeAmountOut(
-    toBN(inputToken.decimals),
-    toBN(outputToken.decimals),
-    toBN(inputReserve),
-    toBN(outputReserve)
-  );
+export const getPriceOnSushiswap = async (amount: number, input: Token, output: Token, eth: Eth): Promise<string> => {
+  const [inputReserve, outputReserve] = await fetchUniswapReserves(input, output, eth);
+  const amountIn = new BigNumber(amount).multipliedBy(10 ** input.decimals);
+  const amountOut = computeAmountOut(amountIn, new BigNumber(inputReserve), new BigNumber(outputReserve));
+
+  return amountOut
+    .dividedBy(10 ** output.decimals)
+    .dividedBy(amount)
+    .decimalPlaces(FRACTIONAL_PRECISION)
+    .toString();
 };
 
 /**
@@ -35,14 +37,11 @@ export const getPriceOnSushiswap = async (inputToken: Token, outputToken: Token,
  * https://github.com/Uniswap/uniswap-v2-periphery/blob/master/contracts/libraries/UniswapV2Library.sol
  *
  */
-function computeAmountIn(inDecimals: BN, outDecimals: BN, reserveIn: BN, reserveOut: BN): string {
-  const amountOut = toBN(10).pow(inDecimals);
-  const numerator = amountOut.mul(WITHOUT_FEE_MULTIPLIER).mul(reserveOut);
-  const denominator = reserveIn.sub(amountOut).mul(WITH_FEE_MULTIPLIER);
+function computeAmountIn(amountOut: BigNumber, reserveIn: BigNumber, reserveOut: BigNumber): BigNumber {
+  const numerator = amountOut.multipliedBy(WITHOUT_FEE_MULTIPLIER).multipliedBy(reserveOut);
+  const denominator = reserveIn.minus(amountOut).multipliedBy(WITH_FEE_MULTIPLIER);
 
-  const price = numerator.div(denominator).add(toBN(1));
-
-  return formatBNToDecimal(price, outDecimals, FRACTIONAL_PRECISION);
+  return numerator.dividedBy(denominator).plus(1);
 }
 
 /**
@@ -51,11 +50,8 @@ function computeAmountIn(inDecimals: BN, outDecimals: BN, reserveIn: BN, reserve
  * https://github.com/Uniswap/uniswap-v2-periphery/blob/master/contracts/libraries/UniswapV2Library.sol
  *
  */
-function computeAmountOut(inDecimals: BN, outDecimals: BN, reserveIn: BN, reserveOut: BN): string {
-  const amountIn = toBN(10).pow(inDecimals).mul(WITH_FEE_MULTIPLIER);
-  const numerator = amountIn.mul(reserveOut);
-  const denominator = reserveIn.mul(WITHOUT_FEE_MULTIPLIER).add(amountIn);
-
-  const price = numerator.div(denominator);
-  return formatBNToDecimal(price, outDecimals, FRACTIONAL_PRECISION);
+function computeAmountOut(amountIn: BigNumber, reserveIn: BigNumber, reserveOut: BigNumber): BigNumber {
+  const numerator = amountIn.multipliedBy(WITH_FEE_MULTIPLIER).multipliedBy(reserveOut);
+  const denominator = reserveIn.multipliedBy(WITHOUT_FEE_MULTIPLIER).plus(amountIn);
+  return numerator.dividedBy(denominator);
 }

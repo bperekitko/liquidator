@@ -8,7 +8,7 @@ import { useGasPrice } from './useGasPrice';
 
 const Web3Context = React.createContext<Web3State>({});
 
-export const Web3Provider: FunctionComponent<unknown> = ({ children }) => {
+export const Web3ContextProvider: FunctionComponent<unknown> = ({ children }) => {
   const valuee = useWeb3Context();
   return <Web3Context.Provider value={valuee}>{children}</Web3Context.Provider>;
 };
@@ -26,10 +26,10 @@ const useWeb3Context = (): Web3State => {
 
   const ethereum = web3.web3Instance.eth;
   const chainId = useChainId();
-  const gasPrice = useGasPrice();
+  const gasPriceInGwei = useGasPrice();
   const { activeAddress, setActiveAddress } = useActiveAddress();
   const lastBlock = useLastBlock();
   const initializeProvider = () => web3.initialize(setActiveAddress);
 
-  return { ethereum: ethereum, chainId, gasPrice, activeAddress, lastBlock, initializeProvider };
+  return { ethereum: ethereum, chainId, gasPriceInGwei, activeAddress, lastBlock, initializeProvider };
 };
