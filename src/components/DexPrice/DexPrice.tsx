@@ -1,58 +1,60 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Token } from '../../ethereum/arbitrage/Token';
+import React, { useEffect, useState } from 'react';
+import { ERC20 } from '../../ethereum/constants/ERC20';
 import styles from './dexPrice.module.scss';
 import { Spinner } from '../Spinner/Spinner';
+import { useTradeContext } from '../../hooks/useTradeContext';
+import { DexLogo } from '../DexLogo/DexLogo';
+import { ArbitrageExecutor } from '../ArbitrageExecutor/ArbitrageExecutor';
 
 interface DexPriceProps {
-  amount: number;
-  token0: Token;
-  token1: Token;
-  dexName: string;
-  getPrice: (amount: number, token0: Token, token1: Token) => Promise<string>;
+	dexName: string;
+	arbitrageContractAddress: string;
+	encodedContractData?: string;
+	getPrice: (amount: number, token0: ERC20, token1: ERC20) => Promise<string>;
 }
 
-export function DexPrice({ amount, token0, token1, dexName, getPrice }: DexPriceProps): JSX.Element {
-  const [isLoadingPrice, setIsLoadingPrice] = useState(false);
-  const [isLoadingLogo, setIsLoadingLogo] = useState(true);
+export function DexPrice({
+	dexName,
+	arbitrageContractAddress,
+	getPrice,
+	encodedContractData,
+}: DexPriceProps): JSX.Element {
+	const [isLoadingPrice, setIsLoadingPrice] = useState(false);
+	const { amount, inputToken, outputToken } = useTradeContext();
+	const [price, setPrice] = useState('');
 
-  const LogoRef = useRef();
-  const [price, setPrice] = useState('');
+	useEffect(() => {
+		const fetchPrice = async () => {
+			setPrice('');
+			if (amount > 0 && inputToken && outputToken && inputToken.ticker !== outputToken.ticker) {
+				setIsLoadingPrice(true);
+				const fetchedPrice = await getPrice(amount, inputToken, outputToken);
+				setPrice(fetchedPrice);
+				setIsLoadingPrice(false);
+			}
+		};
 
-  useEffect(() => {
-    const fetchPrice = async () => {
-      setPrice('');
-      if (amount > 0 && token0 && token1 && token0.ticker !== token1.ticker) {
-        setIsLoadingPrice(true);
-        const fetchedPrice = await getPrice(amount, token0, token1);
-        setPrice(fetchedPrice);
-        setIsLoadingPrice(false);
-      }
-    };
+		fetchPrice();
 
-    fetchPrice();
+		const pricePollingInterval = setInterval(fetchPrice, 4000);
 
-    const pricePollingInterval = setInterval(fetchPrice, 4000);
+		return () => clearInterval(pricePollingInterval);
+	}, [amount, inputToken, outputToken]);
 
-    return () => clearInterval(pricePollingInterval);
-  }, [amount, token0, token1]);
-
-  useEffect(() => {
-    const loadLogo = async () => {
-      setIsLoadingLogo(true);
-      LogoRef.current = (await import(`../../assets/images/${dexName.toLocaleLowerCase()}-logo.svg`)).default;
-      setIsLoadingLogo(false);
-    };
-
-    loadLogo();
-  }, [dexName]);
-
-  return (
-    <div className={styles.dex_price_container}>
-      <div className={styles.dex_header}>
-        {!isLoadingLogo && LogoRef.current ? <LogoRef.current className={styles.dex_logo} /> : <Spinner size={16} />}
-        <span className={styles.dex_name}>{dexName}</span>
-      </div>
-      {isLoadingPrice ? <Spinner size={40} /> : <span className={styles.dex_price}>{price}</span>}
-    </div>
-  );
+	return (
+		<div className={styles.dex_price_container}>
+			<div className={styles.dex_header}>
+				<DexLogo dexName={dexName} />
+				<span className={styles.dex_name}>{dexName}</span>
+			</div>
+			<div className={styles.dex_price_spinner}>
+				{isLoadingPrice ? <Spinner size={40} /> : <span className={styles.dex_price}>{price}</span>}
+			</div>
+			<ArbitrageExecutor
+				price={+price}
+				arbitrageContractAddress={arbitrageContractAddress}
+				encodedData={encodedContractData}
+			></ArbitrageExecutor>
+		</div>
+	);
 }

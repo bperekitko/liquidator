@@ -1,0 +1,171 @@
+import Web3 from 'web3';
+import { soliditySha3, hexToBytes, bytesToHex } from 'web3-utils';
+
+function encode() {
+	const swapONE = {
+		Swap: {
+			pool: 'address',
+			tokenIn: 'address',
+			tokenOut: 'address',
+			swapAmount: 'uint256',
+			limitReturnAmount: 'uint256',
+			maxPrice: 'uint256',
+		},
+	};
+	// const swapsRef = [
+	// 	{
+	// 		prop2: {
+	// 			pool: 'address',
+	// 			tokenIn: 'address',
+	// 			tokenOut: 'address',
+	// 			swapAmount: 'uint256',
+	// 			limitReturnAmount: 'uint256',
+	// 			maxPrice: 'uint256',
+	// 		},
+	// 	},
+	// ];
+	const swapsRef = {
+		prop1: [],
+	};
+
+	const swaps = [
+		[
+			{
+				maxPrice: '444',
+				limitReturnAmount: '222',
+				swapAmount: '555',
+				pool: '0x0000000000000000000000000000000000000125',
+				tokenIn: '0x0000000000000000000000000000000000000123',
+				tokenOut: '0x0000000000000000000000000000000000000123',
+			},
+			{
+				pool: '0x0000000000000000000000000000000000000124',
+				tokenIn: '0x0000000000000000000000000000000000000125',
+				tokenOut: '0x0000000000000000000000000000000000000126',
+				swapAmount: '1',
+				limitReturnAmount: '33',
+				maxPrice: '22',
+			},
+		],
+		[
+			{
+				pool: '0x0000000000000000000000000000000000000123',
+				tokenIn: '0x0000000000000000000000000000000000000123',
+				tokenOut: '0x0000000000000000000000000000000000000123',
+				limitReturnAmount: '33',
+				maxPrice: '22',
+				swapAmount: '1',
+			},
+			{
+				pool: '0x0000000000000000000000000000000000000123',
+				tokenIn: '0x0000000000000000000000000000000000000123',
+				tokenOut: '0x0000000000000000000000000000000000000123',
+				swapAmount: '1',
+				limitReturnAmount: '33',
+				maxPrice: '22',
+			},
+		],
+	];
+
+	const outer = [];
+	swaps.forEach((outerSwap) => {
+		const innerArray = [];
+		outerSwap.forEach((innerSwap) => {
+			const { pool, tokenIn, tokenOut, swapAmount, limitReturnAmount, maxPrice } = innerSwap;
+			const tuple = [pool, tokenIn, tokenOut, swapAmount, limitReturnAmount, maxPrice];
+			innerArray.push(tuple);
+		});
+		outer.push(innerArray);
+	});
+
+	const other = swaps.map((outerSwap) =>
+		outerSwap.map((swap) => {
+			const { pool, tokenIn, tokenOut, swapAmount, limitReturnAmount, maxPrice } = swap;
+			return [pool, tokenIn, tokenOut, swapAmount, limitReturnAmount, maxPrice];
+		})
+	);
+
+	const oneSwap = [
+		[
+			[
+				'0x0000000000000000000000000000000000000124',
+				'0x0000000000000000000000000000000000000125',
+				'0x0000000000000000000000000000000000000126',
+				1111,
+				2222,
+				3333,
+			],
+			[
+				'0x0000000000000000000000000000000000000123',
+				'0x0000000000000000000000000000000000000123',
+				'0x0000000000000000000000000000000000000123',
+				33,
+				22,
+				1,
+			],
+		],
+		[
+			[
+				'0x0000000000000000000000000000000000000123',
+				'0x0000000000000000000000000000000000000123',
+				'0x0000000000000000000000000000000000000123',
+				33,
+				22,
+				1,
+			],
+			[
+				'0x0000000000000000000000000000000000000123',
+				'0x0000000000000000000000000000000000000123',
+				'0x0000000000000000000000000000000000000123',
+				33,
+				22,
+				1,
+			],
+		],
+	];
+	// const nestedBytes =
+	// 	'0x
+	// 	0000000000000000000000000000000000000000000000000000000000000020
+	// 	0000000000000000000000000000000000000000000000000000000000000002
+	// 	0000000000000000000000000000000000000000000000000000000000000040
+	// 	00000000000000000000000000000000000000000000000000000000000001e0
+
+	// 	0000000000000000000000000000000000000000000000000000000000000002
+
+	// 	0000000000000000000000000000000000000000000000000000000000000002
+	// 	';
+	// const nestedBytes2 =
+	// 	'0x
+	// 	0000000000000000000000000000000000000000000000000000000000000020
+	// 	0000000000000000000000000000000000000000000000000000000000000002
+	// 	0000000000000000000000000000000000000000000000000000000000000040
+	// 	00000000000000000000000000000000000000000000000000000000000001e0
+
+	// 	0000000000000000000000000000000000000000000000000000000000000002
+
+	// 	0000000000000000000000000000000000000000000000000000000000000002
+	// 	';
+
+	// console.log(nestedBytes.length);
+	// console.log(nestedBytes2.length);
+	const web3 = new Web3();
+	const type = 'tuple[]';
+	const encodedArrays = web3.eth.abi.encodeParameter('(address,address,address,uint256,uint256,uint256)[][]', other);
+	// const encodedArrays = web3.eth.abi.encodeParameter(type, swaps);
+	// let encoded = web3.eth.abi.encodeParameter(type, oneSwap);
+	// swaps.forEach((s) => s.forEach((s1) => (encoded += web3.eth.abi.encodeParameter(swapONE, s1).substring(2))));
+	// const encodedArrays2 = web3.eth.abi.encodeParameter(swapsRef, swaps);
+
+	// encoded = web3.eth.abi.encodeParameter(swapONE, swaps[0]);
+	// const encodedArrays2 = web3.eth.abi.decodeParameter(type, encodedArrays);
+	// console.log(encodedArrays);
+	console.log(encodedArrays);
+
+	// const bytesString =
+	// 	'0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000012300000000000000000000000000000000000000000000000000000000000001230000000000000000000000000000000000000000000000000000000000000123000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000210000000000000000000000000000000000000000000000000000000000000016';
+
+	// const decoded = web3.eth.abi.decodeParameter(swapsRef, bytesString);
+	// console.log(decoded);
+}
+
+encode();
