@@ -27,6 +27,7 @@ contract BalancerArbitrageur is Arbitrageur, IUniswapV2Callee {
 		IExchangeProxy proxy = IExchangeProxy(targetContract);
 		uint256 amountReceived = proxy.multihopBatchSwapExactIn(swaps, tokenToSwap, tokenReceived, amountIn, amountNeeded);
 
+
 		uint256 profit = amountReceived - amountNeeded;
 
 		tokenReceived.transfer(msg.sender, amountNeeded);

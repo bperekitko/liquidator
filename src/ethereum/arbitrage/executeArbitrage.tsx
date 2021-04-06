@@ -13,8 +13,6 @@ interface ArbitrageData {
 	encodedData?: string;
 }
 
-const { web3Instance } = useWeb3();
-
 export function executeArbitrage({
 	inputToken,
 	outputToken,
@@ -23,30 +21,21 @@ export function executeArbitrage({
 	senderAddress,
 	encodedData,
 }: ArbitrageData): void {
+	const { web3Instance: web3 } = useWeb3();
+
 	const amountToSwap = new BigNumber(amount).multipliedBy(10 ** inputToken.decimals);
 	const amount0Out = inputToken.address < outputToken.address ? amountToSwap.toString() : '0';
 	const amount1Out = inputToken.address > outputToken.address ? amountToSwap.toString() : '0';
 
-	const data = encodedData || web3Instance.eth.abi.encodeParameter('bytes', '0x1');
+	const data = encodedData || web3.eth.abi.encodeParameter('bytes', '0x1');
 
 	const pairAddress = computeUniswapPairAddress(inputToken, outputToken);
-	const pairContract = new web3Instance.eth.Contract(UniswapV2PairAbi, pairAddress);
+	const pairContract = new web3.eth.Contract(UniswapV2PairAbi, pairAddress);
+
 	const swap = pairContract.methods.swap(amount0Out, amount1Out, arbitrageContractAddress, data);
 
-	// console.log('Estimating gas...');
-	// const estimatedGas = await swap.estimateGas();
-	// console.log(`Estimated gas is ${estimatedGas}`);
-
-	const tx = swap.send({
+	swap.send({
 		from: senderAddress,
 		value: new BigNumber(0).toString(),
 	});
-
-	const confirmationCallback = (confirmationNumber, receipt) => {
-		console.log('CONFIRMED!');
-		console.log(confirmationNumber);
-		console.log(receipt);
-		tx.removeListener('confirmation', confirmationCallback);
-	};
-	tx.on('confirmation', confirmationCallback);
 }

@@ -35,13 +35,13 @@ abstract contract Arbitrageur {
 		assert(msg.sender == UniswapV2Library.pairFor(uniswapFactory, token0, token1));
 		assert(amount0 == 0 || amount1 == 0);
 
+		amountToSwap = amount0 == 0 ? amount1 : amount0;
 		tokenToSwap = IERC20(amount0 == 0 ? token1 : token0);
 		tokenReceived = IERC20(amount0 == 0 ? token0 : token1);
 
 		(uint256 reserveA, uint256 reserveB) = UniswapV2Library.getReserves(uniswapFactory, token0, token1);
 		amountRequired = UniswapV2Library.getAmountIn(amountToSwap, reserveA, reserveB);
 
-		amountToSwap = amount0 == 0 ? amount1 : amount0;
 		tokenToSwap.approve(targetContract, amountToSwap);
 	}
 

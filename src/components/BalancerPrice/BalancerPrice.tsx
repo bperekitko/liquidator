@@ -14,7 +14,6 @@ export function BalancerPrice(): JSX.Element {
 		const [swaps, price] = await sor.getPrice(amt, inputToken, outputToken);
 		const encoded = encodeSwaps(swaps);
 		setEncodedSwaps(encoded);
-		console.log('Encoded swaps: ', encoded);
 		return price;
 	};
 
@@ -32,7 +31,7 @@ export function BalancerPrice(): JSX.Element {
 		<DexPrice
 			dexName={'Balancer'}
 			getPrice={getPrice}
-			arbitrageContractAddress=""
+			arbitrageContractAddress="0x3Aa5ebB10DC797CAC828524e59A333d0A371443c"
 			encodedContractData={encodedSwaps}
 		></DexPrice>
 	);
